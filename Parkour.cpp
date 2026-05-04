@@ -10,29 +10,37 @@ void ParkourGame::resetCheese()
 }
 
 // ===============================
-float ParkourGame::getGroundHeight(float x)
+bool ParkourGame::isGap(float x)
 {
-    int ix = (int)x;
-
-    if (ix < 0 || ix >= (int)groundMap.size())
-        return -1.f;
-
-    return groundMap[ix];
+    int seg = (int)(x / 200.f);
+    return (seg % 8 == 0);
 }
 
 // ===============================
-bool ParkourGame::isGap(float x)
+float ParkourGame::getGroundHeight(float x)
 {
-    return getGroundHeight(x) < 0.f;
+    if (isGap(x))
+        return -1.f;
+
+    return 520.f +
+        std::sin(x * 0.01f) * 60.f +
+        std::sin(x * 0.003f) * 80.f;
 }
 
 // ===============================
 void ParkourGame::init(sf::RenderWindow& window)
 {
-    mouseTex.loadFromFile("D:/VS project/鼠鼠大作战/images/mouse.png");
-    mousePlusPlusTex.loadFromFile("images/mouse++.png");
-    cheeseTex.loadFromFile("images/cheese.png");
-    font.loadFromFile("D:/VS project/鼠鼠大作战/x64/Debug/simhei.ttf");
+    if (!mouseTex.loadFromFile("D:/VS project/鼠鼠大作战/images/mouse.png"))
+        std::cout << "mouse.png load failed!" << std::endl;
+
+    if (!mousePlusPlusTex.loadFromFile("D:/VS project/鼠鼠大作战/images/mouse++.png"))
+        std::cout << "mouse++.png load failed!" << std::endl;
+
+    if (!cheeseTex.loadFromFile("images/cheese.png"))
+        std::cout << "cheese.png load failed!" << std::endl;
+
+    if (!font.loadFromFile("D:/VS project/鼠鼠大作战/x64/Debug/simhei.ttf"))
+        std::cout << "font load failed!" << std::endl;
 
     mouse.setTexture(mouseTex);
 
@@ -42,23 +50,14 @@ void ParkourGame::init(sf::RenderWindow& window)
     auto ts = mouseTex.getSize();
     mouse.setScale(targetW / ts.x, targetH / ts.y);
 
-    groundMap.resize(50000);
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(24);
+    scoreText.setFillColor(sf::Color::White);
+    scoreText.setPosition(10.f, 10.f);
 
-    for (int x = 0; x < 50000; x++)
-    {
-        int seg = x / 200;
-
-        if (seg % 8 == 0)
-        {
-            groundMap[x] = -1.f;
-            continue;
-        }
-
-        groundMap[x] =
-            520.f +
-            std::sin(x * 0.01f) * 60.f +
-            std::sin(x * 0.003f) * 80.f;
-    }
+    gameOverText.setFont(font);
+    gameOverText.setCharacterSize(40);
+    gameOverText.setFillColor(sf::Color::Red);
 
     start();
 }
@@ -66,19 +65,21 @@ void ParkourGame::init(sf::RenderWindow& window)
 // ===============================
 void ParkourGame::start()
 {
-    playerWorldX = 200.f;
-    playerWorldY = getGroundHeight(playerWorldX);
-
-    velocity = { 0.f, 0.f };
-
+    cameraX = 0.f;
     score = 0.f;
     finalScore = 0.f;
 
+    velocity = { 0.f, 0.f };
     onGround = false;
     isFalling = false;
 
     resetCheese();
     lastCheeseX = 0.f;
+
+    float g = getGroundHeight(200.f);
+    mouse.setPosition(200.f, g - mouse.getGlobalBounds().height);
+
+    onGround = true;
 }
 
 // ===============================
@@ -88,38 +89,39 @@ void ParkourGame::reset()
 }
 
 // ===============================
-// ⭐奶酪系统（仅降低密度版本）
 void ParkourGame::generateCheeseChain(float baseX)
 {
-    // 🔻降低生成数量：3~5 → 2~3
-    int pattern[3] = { 2, 3, 3 };
+    int pattern[3] = { 3, 4, 5 };
     int count = pattern[rand() % 3];
 
-    // 🔻增加间距：55 → 75
-    float spacing = 75.f;
-    float offset = -(count / 2.f) * spacing;
+    float spacing = 55.f;
+    float startOffset = -(count / 2.f) * spacing;
 
+    // ⭐关键：老鼠高度作为统一贴地参考
+    float mouseHeight = mouse.getGlobalBounds().height;
     float cheeseH = cheeseTex.getSize().y * 0.06f;
+
+    // 固定抬升：保证可吃且不贴地
+    float heightOffset = mouseHeight * 0.6f;
 
     for (int i = 0; i < count; i++)
     {
-        float x = baseX + offset + i * spacing;
+        float x = baseX + startOffset + i * spacing;
 
-        float x1 = x - 10.f;
-        float x2 = x + 10.f;
+        float g = getGroundHeight(x);
 
-        float g1 = getGroundHeight(x1);
-        float g2 = getGroundHeight(x2);
-
-        if (g1 < 0.f || g2 < 0.f)
+        // 空洞直接跳过
+        if (g < 0.f)
             continue;
 
-        float g = (g1 + g2) * 0.5f;
+        // ================= ⭐核心逻辑：贴地生成 =================
+        float y = g - heightOffset - cheeseH;
+        // =======================================================
 
         sf::Sprite c;
         c.setTexture(cheeseTex);
         c.setScale(0.06f, 0.06f);
-        c.setPosition(x, g - cheeseH - 2.f);
+        c.setPosition(x, y);
 
         cheeses.push_back(c);
     }
@@ -128,102 +130,134 @@ void ParkourGame::generateCheeseChain(float baseX)
 // ===============================
 void ParkourGame::update(sf::RenderWindow& window)
 {
+    static GameState lastState = GameOver;
+
+    if (*state == Parkour && lastState != Parkour)
+        start();
+
+    lastState = *state;
+
     if (*state == GameOver)
         return;
 
     float speed = 6.f;
+    float screenX = window.getSize().x / 2.f;
+
+    float oldCam = cameraX;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        playerWorldX += speed;
+        cameraX += speed;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        playerWorldX -= speed;
+        cameraX -= speed;
 
-    float playerH = mouse.getGlobalBounds().height;
+    if (cameraX < 0.f)
+        cameraX = 0.f;
 
-    float groundNow = getGroundHeight(playerWorldX);
-    bool hasGround = (groundNow >= 0.f);
+    sf::Texture* tex = nullptr;
 
-    // =========================
-    velocity.y += gravity * 0.4f;
-
-    bool grounded = false;
-
-    if (hasGround && playerWorldY >= groundNow - playerH && velocity.y >= 0.f)
-    {
-        playerWorldY = groundNow - playerH;
-        velocity.y = 0.f;
-        grounded = true;
-        onGround = true;
-    }
+    if (score >= 52)
+        tex = &mousePlusPlusTex;
     else
+        tex = &mouseTex;
+
+    mouse.setTexture(*tex);
+
+    float targetW = 80.f;
+    float targetH = 80.f;
+
+    auto ts = tex->getSize();
+    if (ts.x > 0 && ts.y > 0)
+        mouse.setScale(targetW / ts.x, targetH / ts.y);
+
+    if (cameraX - lastCheeseX > 300.f)
     {
-        playerWorldY += velocity.y;
+        generateCheeseChain(cameraX + 700.f);
+        lastCheeseX = cameraX;
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && onGround)
+    {
+        velocity.y = jumpPower;
         onGround = false;
     }
 
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && grounded)
+    velocity.y += gravity;
+    mouse.move(0.f, velocity.y);
+    mouse.setPosition(screenX, mouse.getPosition().y);
+
+    float worldX = cameraX + screenX;
+    float groundY = getGroundHeight(worldX);
+    float nextGroundY = getGroundHeight(worldX + 10.f);
+
+    bool hasGround = (groundY >= 0.f);
+    bool hasRightGround = (nextGroundY >= 0.f);
+
+    float h = mouse.getGlobalBounds().height;
+    float footY = mouse.getPosition().y + h;
+
+    onGround = false;
+
+    if (!isFalling && hasGround && velocity.y >= 0.f)
     {
-        velocity.y = -18.f;
+        if (footY >= groundY)
+        {
+            mouse.setPosition(screenX, groundY - h);
+            velocity.y = 0.f;
+            onGround = true;
+        }
     }
 
-    float nextGround = getGroundHeight(playerWorldX + 120.f);
-    bool atCliff = hasGround && (nextGround < 0.f);
-
-    if (atCliff)
-    {
+    if (!isFalling && hasGround && !hasRightGround && velocity.y >= 0.f)
         isFalling = true;
-    }
 
-    if (isFalling)
-    {
-        velocity.y += gravity * 1.6f;
-        playerWorldY += velocity.y;
-    }
-
-    if (playerWorldY > window.getSize().y + 200.f)
+    if (isFalling &&
+        mouse.getPosition().y > window.getSize().y + 120.f)
     {
         finalScore = score;
         *state = GameOver;
         return;
     }
 
-    float screenX = window.getSize().x / 2.f;
-    cameraX = playerWorldX - screenX;
-
-    // 🔻降低生成频率：300 → 450
-    if (playerWorldX - lastCheeseX > 450.f)
-    {
-        generateCheeseChain(playerWorldX + 700.f);
-        lastCheeseX = playerWorldX;
-    }
-
-    sf::FloatRect playerRect(
-        playerWorldX,
-        playerWorldY,
-        mouse.getGlobalBounds().width,
-        mouse.getGlobalBounds().height
-    );
-
     for (int i = 0; i < cheeses.size(); )
     {
-        if (playerRect.intersects(cheeses[i].getGlobalBounds()))
+        sf::FloatRect player = mouse.getGlobalBounds();
+        player.height *= 0.7f;
+
+        if (player.intersects(cheeses[i].getGlobalBounds()))
         {
             score += 1.f;
             cheeses.erase(cheeses.begin() + i);
         }
-        else
-            i++;
+        else i++;
     }
+
+    float delta = cameraX - oldCam;
+
+    for (auto& c : cheeses)
+        c.move(-delta, 0.f);
 }
 
 // ===============================
 void ParkourGame::draw(sf::RenderWindow& window)
 {
-    float screenX = window.getSize().x / 2.f;
+    scoreText.setString("Score: " + std::to_string((int)score));
+    window.draw(scoreText);
 
-    mouse.setPosition(screenX, playerWorldY);
-    window.draw(mouse);
+    if (*state == GameOver)
+    {
+        gameOverText.setString(
+            "Game Over\nFinal Score: " + std::to_string((int)finalScore)
+        );
+
+        gameOverText.setPosition(
+            window.getSize().x / 2.f - 150.f,
+            window.getSize().y / 2.f - 100.f
+        );
+
+        window.draw(gameOverText);
+        return;
+    }
 
     for (int i = 0; i < window.getSize().x; i += 4)
     {
@@ -234,30 +268,15 @@ void ParkourGame::draw(sf::RenderWindow& window)
 
         sf::Vertex line[] =
         {
-            sf::Vertex(sf::Vector2f(i, y), sf::Color(139,69,19)),
-            sf::Vertex(sf::Vector2f(i, window.getSize().y), sf::Color(139,69,19))
+            sf::Vertex(sf::Vector2f(i, y), sf::Color(139, 69, 19)),
+            sf::Vertex(sf::Vector2f(i, window.getSize().y), sf::Color(139, 69, 19))
         };
 
         window.draw(line, 2, sf::Lines);
     }
 
     for (auto& c : cheeses)
-    {
-        sf::Sprite temp = c;
-        temp.move(-cameraX, 0.f);
-        window.draw(temp);
-    }
+        window.draw(c);
 
-    scoreText.setFont(font);
-    scoreText.setString("Score: " + std::to_string((int)score));
-    scoreText.setPosition(10.f, 10.f);
-    window.draw(scoreText);
-
-    if (*state == GameOver)
-    {
-        gameOverText.setFont(font);
-        gameOverText.setString("Game Over\nFinal: " + std::to_string((int)finalScore));
-        gameOverText.setPosition(400.f, 300.f);
-        window.draw(gameOverText);
-    }
-}// test commit
+    window.draw(mouse);
+}

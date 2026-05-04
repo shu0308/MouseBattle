@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <SFML/Graphics.hpp>
 #include "GameState.h"
 
@@ -9,29 +10,40 @@ public:
     void update(sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 
-    // ⭐新增：用于判断MENU按钮点击
     bool isBackClicked(sf::Vector2f mousePos) const;
 
+public:
     GameState* state = nullptr;
 
 private:
-    sf::Texture phoneTex, phonePlusTex, phonePlusPlusTex, sleepTex;
-    sf::Texture cheeseTex, badCheeseTex;
+    sf::Texture phoneTex;
+    sf::Texture phonePlusTex;
+    sf::Texture phonePlusPlusTex;
+    sf::Texture sleepTex;
+
+    sf::Texture cheeseTex;
+    sf::Texture badCheeseTex;
 
     sf::Sprite sprite;
+
     sf::Sprite cheeseButton;
     sf::Sprite badCheeseButton;
 
     sf::RectangleShape backBtn;
     sf::Text backText;
 
-    sf::Font font;
     sf::Text clockText;
     sf::Text moodText;
+    sf::Font font;
 
-    int mood = 0;
+    int mood = 50;
     int bgState = 0;
 
     bool mouseDownLast = false;
     bool lockBg = false;
+
+    float lockTimer = 0.f;
+
+    // ⭐亮度遮罩
+    sf::RectangleShape brightnessOverlay;
 };

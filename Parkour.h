@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#pragma message(">>> LazyMouse.h IS INCLUDED <<<")
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include <vector>
@@ -13,58 +14,56 @@ public:
     void update(sf::RenderWindow& window);
     void draw(sf::RenderWindow& window);
 
-public:
-    GameState* state = nullptr;
-
-    float finalScore = 0.f;
-
 private:
     // =========================
-    // 地形
+    // 地形系统
     float getGroundHeight(float x);
     bool isGap(float x);
 
-    std::vector<float> groundMap;
+    // =========================
+    // 奶酪生成（3/4/5连串）
+    void generateCheeseChain(float baseX);
 
     // =========================
-    // 奶酪
-    void generateCheeseChain(float baseX);
+    // 重置奶酪
     void resetCheese();
 
-    std::vector<sf::Sprite> cheeses;
-    float lastCheeseX = 0.f;
-
+public:
     // =========================
-    // 玩家（world坐标）
-    float playerWorldX = 200.f;
-    float playerWorldY = 0.f;
+    // 资源（皮肤系统）
 
-    // =========================
-    // 物理
-    sf::Vector2f velocity;
-    float gravity = 0.6f;
+    sf::Texture mouseTex;          // 默认皮肤
+    sf::Texture mousePlusTex;      // ⭐保留（兼容旧版本）
+    sf::Texture mousePlusPlusTex;  // ⭐52分进化皮肤
 
-    bool onGround = false;
-
-    // ⭐新增：掉落状态（死亡逻辑用）
-    bool isFalling = false;
-
-    // =========================
-    // 摄像机
-    float cameraX = 0.f;
-
-    // =========================
-    // 分数
-    float score = 0.f;
-
-    // =========================
-    // 资源
-    sf::Texture mouseTex;
-    sf::Texture mousePlusPlusTex;
     sf::Texture cheeseTex;
 
     sf::Sprite mouse;
+    std::vector<sf::Sprite> cheeses;
 
+    // =========================
+    // 物理系统
+    sf::Vector2f velocity;
+
+    float gravity = 0.6f;
+    float jumpPower = -12.f;
+
+    bool onGround = false;
+
+    // =========================
+    // 游戏状态
+    GameState* state = nullptr;
+
+    float cameraX = 0.f;
+    float score = 0.f;
+    float finalScore = 0.f;
+
+    bool isFalling = false;
+
+    float lastCheeseX = 0.f;
+
+    // =========================
+    // UI
     sf::Font font;
     sf::Text scoreText;
     sf::Text gameOverText;

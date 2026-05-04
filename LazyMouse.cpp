@@ -69,7 +69,7 @@ void LazyMouse::init(sf::RenderWindow& window)
     clockText.setCharacterSize(30);
     clockText.setPosition(10.f, 60.f);
 
-    mood = rand() % 101;
+    mood = 50 + (std::rand() % 21 - 10);
 
     moodText.setFont(font);
     moodText.setCharacterSize(30);
@@ -78,6 +78,10 @@ void LazyMouse::init(sf::RenderWindow& window)
     bgState = 0;
     mouseDownLast = false;
     lockBg = false;
+    lockTimer = 0.f;
+
+    brightnessOverlay.setSize((sf::Vector2f)window.getSize());
+    brightnessOverlay.setFillColor(sf::Color(0, 0, 0, 0));
 }
 
 // ===============================
@@ -95,6 +99,18 @@ void LazyMouse::update(sf::RenderWindow& window)
     char buf[32];
     sprintf_s(buf, "%02d:%02d:%02d", t.tm_hour, t.tm_min, t.tm_sec);
     clockText.setString(buf);
+
+    if (lockBg)
+    {
+        lockTimer += 1.f / 60.f;
+
+        if (lockTimer >= 5.f)
+        {
+            lockBg = false;
+            lockTimer = 0.f;
+            bgState = 0;
+        }
+    }
 
     if (!lockBg)
     {
@@ -125,6 +141,7 @@ void LazyMouse::update(sf::RenderWindow& window)
             mood = std::min(mood + 5, 100);
             bgState = 1;
             lockBg = true;
+            lockTimer = 0.f;
         }
 
         if (badCheeseButton.getGlobalBounds().contains(m))
@@ -132,12 +149,25 @@ void LazyMouse::update(sf::RenderWindow& window)
             mood = std::max(mood - 5, 0);
             bgState = 2;
             lockBg = true;
+            lockTimer = 0.f;
         }
     }
 
     mouseDownLast = mouseNow;
 
     moodText.setString("Mood: " + std::to_string(mood));
+
+    // ===============================
+    // ⭐核心修改：背景=默认时恢复亮度
+    float alpha = 0.f;
+
+    if (bgState != 0)
+    {
+        float brightness = 1.f - (mood / 100.f);
+        alpha = brightness * 180.f;
+    }
+
+    brightnessOverlay.setFillColor(sf::Color(0, 0, 0, (sf::Uint8)alpha));
 }
 
 // ===============================
@@ -152,10 +182,11 @@ void LazyMouse::draw(sf::RenderWindow& window)
 
     window.draw(backBtn);
     window.draw(backText);
+
+    window.draw(brightnessOverlay);
 }
 
 // ===============================
-// ⭐新增：MENU按钮点击检测
 bool LazyMouse::isBackClicked(sf::Vector2f mousePos) const
 {
     return backBtn.getGlobalBounds().contains(mousePos);
