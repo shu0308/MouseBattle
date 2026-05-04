@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include "BigEater.h"
 #include "Parkour.h"
-#include "LazyMouse.h"   // ⭐新增
+#include "LazyMouse.h"  
 
 int main()
 {
@@ -23,8 +23,8 @@ int main()
     parkour.state = &game.state;
     parkour.init(window);
 
-    LazyMouse lazy;          // ⭐新增
-    lazy.init(window);       // ⭐新增
+    LazyMouse lazy;
+    lazy.init(window);
 
     sf::Vector2u screen = window.getSize();
     float cx = screen.x / 2.f;
@@ -53,7 +53,7 @@ int main()
     auto center = [&](sf::Text& t, sf::Vector2f p)
         {
             sf::FloatRect b = t.getLocalBounds();
-            t.setOrigin(b.width / 2, b.height / 2);
+            t.setOrigin(b.width / 2.f, b.height / 2.f);
             t.setPosition(p);
             t.setFillColor(sf::Color::Black);
         };
@@ -82,18 +82,26 @@ int main()
 
             sf::Vector2f mpos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
-            if (button1.getGlobalBounds().contains(mpos)) button1.setFillColor(sf::Color(200, 200, 255));
-            else button1.setFillColor(sf::Color::White);
+            if (button1.getGlobalBounds().contains(mpos))
+                button1.setFillColor(sf::Color(200, 200, 255));
+            else
+                button1.setFillColor(sf::Color::White);
 
-            if (button2.getGlobalBounds().contains(mpos)) button2.setFillColor(sf::Color(200, 200, 255));
-            else button2.setFillColor(sf::Color::White);
+            if (button2.getGlobalBounds().contains(mpos))
+                button2.setFillColor(sf::Color(200, 200, 255));
+            else
+                button2.setFillColor(sf::Color::White);
 
-            if (button3.getGlobalBounds().contains(mpos)) button3.setFillColor(sf::Color(200, 200, 255));
-            else button3.setFillColor(sf::Color::White);
+            if (button3.getGlobalBounds().contains(mpos))
+                button3.setFillColor(sf::Color(200, 200, 255));
+            else
+                button3.setFillColor(sf::Color::White);
 
             if (event.type == sf::Event::MouseButtonPressed &&
                 quit.getGlobalBounds().contains(mpos))
+            {
                 window.close();
+            }
 
             // ================= 菜单点击 =================
             if (game.state == MainMenu && event.type == sf::Event::MouseButtonPressed)
@@ -112,10 +120,9 @@ int main()
                     parkour.start();
                 }
 
-                // ⭐新增：LazyMouse
                 if (button3.getGlobalBounds().contains(mpos))
                 {
-                    game.state = LazyMouseMode;
+                    game.state = LazyMouseMode;   // ✔关键修复
                     lastMode = LazyMouseMode;
                 }
             }
@@ -127,7 +134,7 @@ int main()
             }
         }
 
-        // ================= 更新 =================
+        // ================= UPDATE =================
         if (game.state == BigEater)
         {
             game.updateBigEater();
@@ -144,7 +151,7 @@ int main()
                 game.finalScore = parkour.finalScore;
         }
 
-        // ⭐新增：LazyMouse更新
+        // ⭐⭐⭐ 新增：LazyMouse update（关键修复）
         if (game.state == LazyMouseMode)
         {
             lazy.update(window);
@@ -153,11 +160,16 @@ int main()
         window.clear();
         window.draw(game.background);
 
-        // ================= 渲染 =================
+        // ================= DRAW =================
         if (game.state == MainMenu)
         {
-            window.draw(button1); window.draw(button2); window.draw(button3);
-            window.draw(t1); window.draw(t2); window.draw(t3);
+            window.draw(button1);
+            window.draw(button2);
+            window.draw(button3);
+
+            window.draw(t1);
+            window.draw(t2);
+            window.draw(t3);
         }
         else if (game.state == BigEater)
         {
@@ -177,9 +189,11 @@ int main()
         }
         else if (game.state == LazyMouseMode)
         {
+            // ⭐⭐⭐ 新增：LazyMouse draw（关键修复）
             lazy.draw(window);
 
-            sf::Vector2f mpos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            sf::Vector2f mpos =
+                window.mapPixelToCoords(sf::Mouse::getPosition(window));
 
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
