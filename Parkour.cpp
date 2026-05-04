@@ -260,4 +260,4 @@ void ParkourGame::draw(sf::RenderWindow& window)
         gameOverText.setPosition(400.f, 300.f);
         window.draw(gameOverText);
     }
-}
+}// test commit
