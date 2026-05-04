@@ -1,0 +1,37 @@
+﻿  main.cpp
+  >>> LazyMouse.h IS INCLUDED <<<
+D:\VS project\鼠鼠大作战\main.cpp(66,31): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
+D:\VS project\鼠鼠大作战\main.cpp(66,31): warning C4244:         with
+D:\VS project\鼠鼠大作战\main.cpp(66,31): warning C4244:         [
+D:\VS project\鼠鼠大作战\main.cpp(66,31): warning C4244:             T=unsigned int
+D:\VS project\鼠鼠大作战\main.cpp(66,31): warning C4244:         ]
+D:\VS project\鼠鼠大作战\main.cpp(70,35): warning C4244: “参数”: 从“T”转换到“float”，可能丢失数据
+D:\VS project\鼠鼠大作战\main.cpp(70,35): warning C4244:         with
+D:\VS project\鼠鼠大作战\main.cpp(70,35): warning C4244:         [
+D:\VS project\鼠鼠大作战\main.cpp(70,35): warning C4244:             T=unsigned int
+D:\VS project\鼠鼠大作战\main.cpp(70,35): warning C4244:         ]
+D:\VS project\鼠鼠大作战\main.cpp(144,42): warning C4244: “=”: 从“float”转换到“int”，可能丢失数据
+  Parkour.cpp
+  >>> LazyMouse.h IS INCLUDED <<<
+D:\VS project\鼠鼠大作战\Parkour.cpp(262,23): warning C4018: “<”: 有符号/无符号不匹配
+D:\VS project\鼠鼠大作战\Parkour.cpp(271,37): warning C4244: “参数”: 从“int”转换到“T”，可能丢失数据
+D:\VS project\鼠鼠大作战\Parkour.cpp(271,37): warning C4244:         with
+D:\VS project\鼠鼠大作战\Parkour.cpp(271,37): warning C4244:         [
+D:\VS project\鼠鼠大作战\Parkour.cpp(271,37): warning C4244:             T=float
+D:\VS project\鼠鼠大作战\Parkour.cpp(271,37): warning C4244:         ]
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244: “参数”: 从“T”转换到“T”，可能丢失数据
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         with
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         [
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:             T=unsigned int
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         ]
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         and
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         [
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:             T=float
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,56): warning C4244:         ]
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,37): warning C4244: “参数”: 从“int”转换到“T”，可能丢失数据
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,37): warning C4244:         with
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,37): warning C4244:         [
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,37): warning C4244:             T=float
+D:\VS project\鼠鼠大作战\Parkour.cpp(272,37): warning C4244:         ]
+  正在生成代码...
+  鼠鼠大作战.vcxproj -> D:\VS project\鼠鼠大作战\x64\Debug\鼠鼠大作战.exe
