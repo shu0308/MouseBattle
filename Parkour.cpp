@@ -30,16 +30,27 @@ float ParkourGame::getGroundHeight(float x)
 // ===============================
 void ParkourGame::init(sf::RenderWindow& window)
 {
+<<<<<<< HEAD
     if (!mouseTex.loadFromFile("D:/VS project/鼠鼠大作战/images/mouse.png"))
         std::cout << "mouse.png load failed!" << std::endl;
 
     if (!mousePlusPlusTex.loadFromFile("D:/VS project/鼠鼠大作战/images/mouse++.png"))
+=======
+    if (!mouseTex.loadFromFile("images/mouse.png"))
+        std::cout << "mouse.png load failed!" << std::endl;
+
+    if (!mousePlusPlusTex.loadFromFile("images/mouse++.png"))
+>>>>>>> afa7661 (temp: save local changes before rebase)
         std::cout << "mouse++.png load failed!" << std::endl;
 
     if (!cheeseTex.loadFromFile("images/cheese.png"))
         std::cout << "cheese.png load failed!" << std::endl;
 
+<<<<<<< HEAD
     if (!font.loadFromFile("D:/VS project/鼠鼠大作战/x64/Debug/simhei.ttf"))
+=======
+    if (!font.loadFromFile("fonts/simhei.ttf"))
+>>>>>>> afa7661 (temp: save local changes before rebase)
         std::cout << "font load failed!" << std::endl;
 
     mouse.setTexture(mouseTex);
@@ -97,11 +108,17 @@ void ParkourGame::generateCheeseChain(float baseX)
     float spacing = 55.f;
     float startOffset = -(count / 2.f) * spacing;
 
+<<<<<<< HEAD
     // ⭐关键：老鼠高度作为统一贴地参考
     float mouseHeight = mouse.getGlobalBounds().height;
     float cheeseH = cheeseTex.getSize().y * 0.06f;
 
     // 固定抬升：保证可吃且不贴地
+=======
+    float mouseHeight = mouse.getGlobalBounds().height;
+    float cheeseH = cheeseTex.getSize().y * 0.06f;
+
+>>>>>>> afa7661 (temp: save local changes before rebase)
     float heightOffset = mouseHeight * 0.6f;
 
     for (int i = 0; i < count; i++)
@@ -110,6 +127,7 @@ void ParkourGame::generateCheeseChain(float baseX)
 
         float g = getGroundHeight(x);
 
+<<<<<<< HEAD
         // 空洞直接跳过
         if (g < 0.f)
             continue;
@@ -117,6 +135,12 @@ void ParkourGame::generateCheeseChain(float baseX)
         // ================= ⭐核心逻辑：贴地生成 =================
         float y = g - heightOffset - cheeseH;
         // =======================================================
+=======
+        if (g < 0.f)
+            continue;
+
+        float y = g - heightOffset - cheeseH;
+>>>>>>> afa7661 (temp: save local changes before rebase)
 
         sf::Sprite c;
         c.setTexture(cheeseTex);

@@ -6,13 +6,13 @@
 // ===============================
 void LazyMouse::init(sf::RenderWindow& window)
 {
-    phoneTex.loadFromFile("D:/VS project/鼠鼠大作战/images/phone.png");
-    phonePlusTex.loadFromFile("D:/VS project/鼠鼠大作战/images/phone+.png");
-    phonePlusPlusTex.loadFromFile("D:/VS project/鼠鼠大作战/images/phone++.png");
-    sleepTex.loadFromFile("D:/VS project/鼠鼠大作战/images/sleep.png");
+    phoneTex.loadFromFile("images/phone.png");
+    phonePlusTex.loadFromFile("images/phone+.png");
+    phonePlusPlusTex.loadFromFile("images/phone++.png");
+    sleepTex.loadFromFile("images/sleep.png");
 
-    cheeseTex.loadFromFile("D:/VS project/鼠鼠大作战/images/cheese.png");
-    badCheeseTex.loadFromFile("D:/VS project/鼠鼠大作战/images/badcheese.png");
+    cheeseTex.loadFromFile("images/cheese.png");
+    badCheeseTex.loadFromFile("images/badcheese.png");
 
     sprite.setTexture(sleepTex);
 
@@ -58,7 +58,7 @@ void LazyMouse::init(sf::RenderWindow& window)
     backBtn.setFillColor(sf::Color(120, 120, 120));
     backBtn.setPosition(10.f, 10.f);
 
-    font.loadFromFile("D:/VS project/鼠鼠大作战/x64/Debug/simhei.ttf");
+    font.loadFromFile("fonts/simhei.ttf");
 
     backText.setFont(font);
     backText.setString("MENU");

@@ -12,12 +12,12 @@ void Game::init(sf::RenderWindow& window)
     bgTex.loadFromFile("images/background.png");
     background.setTexture(bgTex);
 
-    bgMusic.openFromFile("D:/VS project/鼠鼠大作战/audio/n-buna - 落花.ogg");
+    bgMusic.openFromFile("audio/n-buna - 落花.ogg");
     bgMusic.setLoop(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
 
-    modeMusic.openFromFile("D:/VS project/鼠鼠大作战/audio/n-buna 初音ミク - もうじき夏が終わるから(2).ogg");
+    modeMusic.openFromFile("audio/n-buna 初音ミク - もうじき夏が終わるから(2).ogg");
     modeMusic.setLoop(true);
     modeMusic.setVolume(60.f);
 
