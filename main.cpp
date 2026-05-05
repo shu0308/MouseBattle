@@ -5,6 +5,7 @@
 #include "BigEater.h"
 #include "Parkour.h"
 #include "LazyMouse.h"  
+#include <filesystem>
 
 int main()
 {
@@ -12,6 +13,12 @@ int main()
     SetConsoleOutputCP(65001);
     SetConsoleCP(65001);
 #endif
+
+    // =========================
+    // ⭐关键修复：统一运行目录
+    // 防止 SFML 找错 audio 路径
+    // =========================
+    std::filesystem::current_path("x64/Debug");
 
     sf::RenderWindow window(sf::VideoMode::getDesktopMode(), "Mouse Adventure", sf::Style::Fullscreen);
     window.setFramerateLimit(60);
@@ -122,7 +129,7 @@ int main()
 
                 if (button3.getGlobalBounds().contains(mpos))
                 {
-                    game.state = LazyMouseMode;   // ✔关键修复
+                    game.state = LazyMouseMode;
                     lastMode = LazyMouseMode;
                 }
             }
@@ -138,7 +145,6 @@ int main()
         if (game.state == BigEater)
         {
             game.updateBigEater();
-
             if (game.state == GameOver)
                 game.finalScore = game.score;
         }
@@ -146,12 +152,10 @@ int main()
         if (game.state == Parkour)
         {
             parkour.update(window);
-
             if (game.state == GameOver)
                 game.finalScore = parkour.finalScore;
         }
 
-        // ⭐⭐⭐ 新增：LazyMouse update（关键修复）
         if (game.state == LazyMouseMode)
         {
             lazy.update(window);
@@ -189,7 +193,6 @@ int main()
         }
         else if (game.state == LazyMouseMode)
         {
-            // ⭐⭐⭐ 新增：LazyMouse draw（关键修复）
             lazy.draw(window);
 
             sf::Vector2f mpos =
@@ -198,9 +201,7 @@ int main()
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
             {
                 if (lazy.isBackClicked(mpos))
-                {
                     game.state = MainMenu;
-                }
             }
         }
         else if (game.state == GameOver)

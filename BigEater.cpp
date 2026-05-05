@@ -1,7 +1,20 @@
-#include "BigEater.h"
+﻿#include "BigEater.h"
 #include <cstdlib>
 #include <cmath>
 #include <algorithm>
+#include <filesystem>
+
+// ===============================
+// ⭐新增：获取资源路径（关键修复）
+static std::string getExePath()
+{
+    return std::filesystem::current_path().string();
+}
+
+static std::string A(std::string file)
+{
+    return getExePath() + "/" + file;
+}
 
 void Game::init(sf::RenderWindow& window)
 {
@@ -12,12 +25,14 @@ void Game::init(sf::RenderWindow& window)
     bgTex.loadFromFile("images/background.png");
     background.setTexture(bgTex);
 
-    bgMusic.openFromFile("audio/n-buna - �仨.ogg");
+    // ===============================
+    // ⭐修复：音频路径（不再依赖VS工作目录）
+    bgMusic.openFromFile(A("audio/bg1.ogg"));
     bgMusic.setLoop(true);
     bgMusic.setVolume(50.f);
     bgMusic.play();
 
-    modeMusic.openFromFile("audio/n-buna �����ߥ� - �⤦�����Ĥ��K��뤫��(2).ogg");
+    modeMusic.openFromFile(A("audio/bg2.ogg"));
     modeMusic.setLoop(true);
     modeMusic.setVolume(60.f);
 
